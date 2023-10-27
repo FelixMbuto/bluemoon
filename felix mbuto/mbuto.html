@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Student Information</title>
+    <script type="text/javascript">
+        const localStorage = window.localStorage;
+        
+        // Function to initialize and update the table
+        const initialize = () => {
+            // Sample student data (name, registration number, and photo URL)
+            const students = [
+                { name: "Felix Mbuto", regNumber: "SCT221-0444/2021", photoURL: "file:///C:/Users/admin/OneDrive/Documents/New%20folder/passport.jpg" },
+            ];
+             // Store student data in local storage
+            localStorage.setItem("students", JSON.stringify(students));
+            
+            // Call function to update the table
+            updateTable();
+
+            // Initialize visit count to 0 if not already set
+            if (!localStorage.getItem("visitCount")) {
+                localStorage.setItem("visitCount", 0);
+            }
+
+            // Increment visit count
+            const visitCount = parseInt(localStorage.getItem("visitCount")) + 1;
+            localStorage.setItem("visitCount", visitCount);
+        };
+
+        // Function to update the table with student information
+        const updateTable = () => {
+            const students = JSON.parse(localStorage.getItem("students")) || [];
+            const tableBody = document.getElementById("studentTableBody");
+
+            // Clear existing rows in the table
+            tableBody.innerHTML = "";
+
+            // Loop through students and create table rows
+            students.forEach(student => {
+                const row = tableBody.insertRow();
+                const nameCell = row.insertCell(0);
+                const regNumberCell = row.insertCell(1);
+                const photoCell = row.insertCell(2);
+
+                // Set cell values with student information
+                nameCell.textContent = student.name;
+                regNumberCell.textContent = student.regNumber;
+
+                // Create an img element for the passport photo
+                const img = document.createElement("img");
+                img.src = student.photoURL;
+                img.alt = student.name + "'s photo";
+                img.width = 100; // Set width as needed
+                photoCell.appendChild(img);
+            });
+        };
+
+        // Function to set background color preference
+        const setColorPreference = color => {
+            const preference = { color };
+            localStorage.setItem("preference", JSON.stringify(preference));
+            updateDOM();
+        };
+
+        // Function to remove visit count
+        const removeCount = () => {
+            localStorage.removeItem("visitCount");
+            updateDOM();
+        };
+
+        // Function to clear all data from local storage
+        const clearAll = () => {
+            localStorage.clear();
+            updateDOM();
+        };
+
+        // Function to show all stored key-value pairs in localStorage
+        const showAllStoredKeyValues = () => {
+            console.log(`We have ${localStorage.length} values`);
+            const ul = document.getElementById("storedItems");
+            ul.innerHTML = "";
+            for (let index = 0; index < localStorage.length; index++) {
+                const key = localStorage.key(index);
+                var li = document.createElement("li");
+                li.appendChild(document.createTextNode(`${key} = ${localStorage.getItem(key)}`));
+                ul.appendChild(li);
+            }
+        };
+
+        // Function to update DOM elements based on local storage data
+        const updateDOM = () => {
+            const count = localStorage.getItem("visitCount") || 0;
+            const storedPreferences = localStorage.getItem("preference");
+            const preference = storedPreferences ? JSON.parse(storedPreferences) : {};
+            document.getElementById("visitCount").innerHTML = `Visit count ${count}`;
+            document.body.style.background = preference.color || "white";
+            showAllStoredKeyValues();
+        };
+
+        // Call initialize function when the body loads
+        window.onload = initialize;
+    </script>
+</head>
+<body onload="initialize()">
+    <h1>Student Information</h1>
+    <ul id="storedItems"></ul>
+    <button type="button" onclick="setColorPreference('red')">Red</button>
+    <button type="button" onclick="setColorPreference('green')">Green</button>
+    <button type="button" onclick="setColorPreference('blue')">Blue</button>
+    <div id="visitCount"></div>
+    <button type="button" onclick="removeCount()">Remove count</button>
+    <button type="button" onclick="clearAll()">Clear all</button>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Registration Number</th>
+                <th>Passport Photo</th>
+            </tr>
+        </thead>
+        <tbody id="studentTableBody">
+            <!-- Table rows with passport photos will be dynamically added here -->
+        </tbody>
+    </table>
+</body>
+</html>
